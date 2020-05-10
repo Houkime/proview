@@ -70,10 +70,11 @@ static const qcom_sQid qdb_cQimport = { qdb_cIimport, 0 };
 static const qcom_sQid qdb_cQexport = { qdb_cIexport, 0 };
 static const qcom_sQid qdb_cQmonitor = { qdb_cImonitor, 0 };
 
-#define qdb_cNameDatabase "/tmp/pwr_qdb"
+#define qdb_cDefaultTmpDir "/tmp/"
+#define qdb_cFileNameDatabase "pwr_qdb"
+#define qdb_cFileNameDbLock "pwr_qdb_lock"
 
-#define qdb_cNamePool "/tmp/pwr_qpool"
-#define qdb_cNameDbLock "/tmp/pwr_qdb_lock"
+#define qdb_cFileNamePool "pwr_qpool"
 
 #if defined OS_LINUX
 #define qdb_cSigMsg SIGRTMIN
@@ -667,6 +668,10 @@ typedef struct {
 
   qdb_sAppl* ap; /* my application */
   qdb_sQue* exportque; /* the export que */
+
+  pwr_tFileName db_lock_path;
+  pwr_tFileName db_path;
+  pwr_tFileName pool_path;
 } qdb_sLocal;
 
 /* The root of all data, the only `global' variable...  */

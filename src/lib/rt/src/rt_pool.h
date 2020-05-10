@@ -147,7 +147,7 @@ typedef struct {
   pwr_tUInt32 fragsize; /* Total size of fragments, pool_sEntry units */
   pwr_tUInt32 seg; /* Segment index */
   pool_eSegType type;
-  char name[16]; /* Name of named segment.  */
+  pwr_tFileName name; /* Name of named segment.  */
   pwr_tUInt32 la_size; /* Lookaside size */
   pwr_tUInt32 la_idx; /* Segment lookaside index.   */
   pwr_tUInt32 next_la_seg; /* Segment index */
@@ -164,7 +164,7 @@ typedef struct {
   pwr_tUInt32 generation; /* Next generation number */
   pwr_tUInt32 initsize; /* Segment 0 size in pool_sEntry units */
   pwr_tUInt32 extendsize; /* Segment 1..n size in pool_sEntry units */
-  char name[16]; /* Name (prefix) */
+  pwr_tFileName name; /* Name (prefix) */
   pwr_tUInt32 la_idx; /* Next free lookaside index.  */
   pool_sList la[pool_cLists]; /* Lookaside lists.  */
   pool_sGsegment seg[pool_cSegs]; /* Entry for each segment */

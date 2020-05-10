@@ -562,11 +562,23 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
     errh_Bugcheck(QDB__INSVIRMEM, "initiating local database");
 
   qdb->my_pid = getpid();
+  
+  /* Define paths. */
+  
+  char *tmpdir = getenv("TMPDIR");
+  if (!tmpdir) {
+	  tmpdir = qdb_cDefaultTmpDir;
+  }
+
+  sprintf(qdb->db_path, "%s/%s", tmpdir, qdb_cFileNameDatabase);
+  sprintf(qdb->db_lock_path, "%s/%s", tmpdir, qdb_cFileNameDbLock);
+  sprintf(qdb->pool_path, "%s/%s", tmpdir, qdb_cFileNamePool);
+
 
   /* Create lock section.  */
 
   sp = sect_Alloc(sts, &created, &qdb->lock, sizeof(sect_sMutex),
-      qdb_cNameDbLock, sect_mFlags_Create);
+      qdb->db_lock_path, sect_mFlags_Create);
   if (sp == NULL)
     errh_Bugcheck(*sts, "creating db lock");
   if (!created)
@@ -577,12 +589,13 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
   ip = evaluateInit(ip);
 
   pp = pool_Create(
-      sts, &qdb->pool, qdb_cNamePool, ip->pool_isize, ip->pool_esize);
+      sts, &qdb->pool, qdb->pool_path, ip->pool_isize, ip->pool_esize);
   if (sp == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
   qdb->g = pool_AllocNamedSegment(
-      sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
+      sts, &qdb->pool, sizeof(*qdb->g), qdb->db_path);
+
   if (qdb->g == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -692,7 +705,7 @@ static void unlinkPool(const char* name)
   struct shmid_ds ds;
 
   char* str = getenv(pwr_dEnvBusId);
-  char segname[128];
+  pwr_tFileName segname;
   char busid[8];
 
   strncpy(busid, (str ? str : "XXX"), 3);
@@ -732,7 +745,7 @@ static void unlinkPool(const char* name)
 
 void qdb_UnlinkDb()
 {
-  char segname[128];
+  pwr_tFileName segname;
   char busid[8];
   char* str = getenv(pwr_dEnvBusId);
   key_t key;
@@ -741,14 +754,14 @@ void qdb_UnlinkDb()
 
   /* Unlink pool. */
 
-  unlinkPool(qdb_cNamePool);
+  unlinkPool(qdb->pool_path);
 
   /* Remove database lock. */
 
   strncpy(busid, (str ? str : "XXX"), 3);
   busid[3] = '\0';
 
-  sprintf(segname, "%s_%.3s", qdb_cNameDbLock, busid);
+  sprintf(segname, "%s_%.3s", qdb->db_lock_path, busid);
 
   key = ftok(segname, 'P');
   shm_id = shmget(key, 0, 0660);
@@ -778,7 +791,7 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
   /* Map lock sections.  */
 
   sp = sect_Alloc(
-      sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb_cNameDbLock, 0);
+      sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb->db_lock_path, 0);
   if (sp == NULL)
     errh_Bugcheck(*sts, "mapping db lock");
   if (created)
@@ -792,12 +805,12 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
 
   /* Map 'pool' & 'rtdb' pools.  */
 
-  pp = pool_Create(sts, &qdb->pool, qdb_cNamePool, 0, 0);
+  pp = pool_Create(sts, &qdb->pool, qdb->pool_path, 0, 0);
   if (pp == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
   qdb->g = pool_AllocNamedSegment(
-      sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
+      sts, &qdb->pool, sizeof(*qdb->g), qdb->db_path);
   if (qdb->g == NULL)
     errh_Bugcheck(*sts, "database directory");
 

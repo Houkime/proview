@@ -37,6 +37,7 @@
 /* rt_qini.c -- Queue Communication, initiation  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "co_string.h"
 

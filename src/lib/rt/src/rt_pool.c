@@ -267,7 +267,7 @@ static pool_sSegment* mapSegment(
   pwr_tStatus lsts;
   sect_sHead* shp;
   pwr_tBoolean created;
-  char name[16];
+  pwr_tFileName name;
   pool_sGhead* gphp = php->gphp;
 
   /* Map the section */
@@ -303,7 +303,7 @@ static pool_sSegment* newSegment(pwr_tStatus* sts, pool_sHead* php,
   sect_sHead* shp;
   pwr_tBoolean created;
   pwr_tUInt32 i;
-  char name[16];
+  pwr_tFileName name;
 
   if (size << pool_cOffsAlign > pool_cMaxSize)
     pwr_Return(NULL, sts, POOL__TOOBIG);
@@ -352,9 +352,9 @@ static pool_sSegment* newSegment(pwr_tStatus* sts, pool_sHead* php,
 
    The routine returns the workstr, filled in.  */
 
-static char* segName(char workstr[16], char* name, pwr_tUInt32 generation)
+static char* segName(pwr_tFileName workstr, char* name, pwr_tUInt32 generation)
 {
-  sprintf(workstr, "%.11s%4.4x", name, generation);
+  sprintf(workstr, "%s%4.4x", name, generation);
   return workstr;
 }
 

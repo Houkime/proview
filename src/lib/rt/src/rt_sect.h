@@ -62,7 +62,7 @@ typedef union {
 typedef struct {
   void* base; /* Virtual address of section.  */
   size_t size;
-  char name[32]; /* Name of section.  */
+  pwr_tFileName name; /* Name of section.  */
   sect_mHead flags;
 } sect_sHead;
 
