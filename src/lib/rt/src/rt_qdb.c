@@ -100,6 +100,21 @@ static int copyBufferData(void* itp, qdb_sBuffer* bp, int offs, int size)
   return size;
 }
 
+/* Set paths for ftok-used files according to TMPDIR */
+
+static void initPaths(qdb_sLocal* root)
+{
+  char *tmpdir = getenv("TMPDIR");
+
+  if (!tmpdir) {
+	  tmpdir = qdb_cDefaultTmpDir;
+  }
+
+  sprintf(root->db_path, "%s/%s", tmpdir, qdb_cFileNameDatabase);
+  sprintf(root->db_lock_path, "%s/%s", tmpdir, qdb_cFileNameDbLock);
+  sprintf(root->pool_path, "%s/%s", tmpdir, qdb_cFileNamePool);
+}
+
 static qdb_sInit* evaluateInit(qdb_sInit* ip)
 {
   if (ip == NULL)
@@ -562,18 +577,10 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
     errh_Bugcheck(QDB__INSVIRMEM, "initiating local database");
 
   qdb->my_pid = getpid();
-  
-  /* Define paths. */
-  
-  char *tmpdir = getenv("TMPDIR");
-  if (!tmpdir) {
-	  tmpdir = qdb_cDefaultTmpDir;
-  }
 
-  sprintf(qdb->db_path, "%s/%s", tmpdir, qdb_cFileNameDatabase);
-  sprintf(qdb->db_lock_path, "%s/%s", tmpdir, qdb_cFileNameDbLock);
-  sprintf(qdb->pool_path, "%s/%s", tmpdir, qdb_cFileNamePool);
+  /* Init token files' paths. */
 
+  initPaths(qdb);
 
   /* Create lock section.  */
 
@@ -772,6 +779,7 @@ void qdb_UnlinkDb()
 
 qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
 {
+  /* NOTE: this section seems very similar to CreateDb. Maybe it can be reorganized and deduplicated */
   pwr_tBoolean created;
   qdb_sLocal* lp;
   pwr_tNodeId no_nid = pwr_cNNodeId;
@@ -786,12 +794,21 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
   if (qdb == NULL)
     errh_Bugcheck(QDB__INSVIRMEM, "initiating local database");
 
+  char *tmpdir = getenv("TMPDIR");
+  if (!tmpdir) {
+	  tmpdir = qdb_cDefaultTmpDir;
+  }
+
   qdb->my_pid = getpid();
+
+  /* Init token files' paths */
+
+  initPaths(qdb);
 
   /* Map lock sections.  */
 
   sp = sect_Alloc(
-      sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb->db_lock_path, 0);
+      sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb->db_lock_path, 0); /* NOTE: this is bad, db_path will be null */
   if (sp == NULL)
     errh_Bugcheck(*sts, "mapping db lock");
   if (created)
