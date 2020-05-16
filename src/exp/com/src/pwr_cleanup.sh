@@ -50,7 +50,11 @@ eval `ipcs -q|grep ^0x|grep "[ \t]$USER[ \t]"|awk '{printf "ipcrm msg %s;", $2}'
 # remove shared memory
 eval `ipcs -m|grep ^0x|grep "[ \t]$USER[ \t]"|awk '{printf "ipcrm shm %s;", $2}'`
 
-if [ $TMPDIR ]; then 
-	rm $TMPDIR/pwr*$PWR_BUS_ID
+tmpdir='/tmp/'
+
+if [ $TMPDIR ]; 
+then 
+	tmpdir=$TMPDIR
 fi
-rm /tmp/pwr*$PWR_BUS_ID
+
+rm $tmpdir/pwr*$PWR_BUS_ID
