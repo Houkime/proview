@@ -319,7 +319,7 @@ static void unlinkPool(const char* name)
   struct shmid_ds ds;
 
   char* str = getenv(pwr_dEnvBusId);
-  char segname[128];
+  pwr_tFileName segname;
   char busid[8];
 
   strncpy(busid, (str ? str : "XXX"), 3);
@@ -339,7 +339,7 @@ static void unlinkPool(const char* name)
     unlink(segname);
 
     for (i = 1; TRUE; i++) {
-      sprintf(segname, "%.11s%4.4x_%.3s", name, i, busid);
+      sprintf(segname, "%s%4.4x_%.3s", name, i, busid);
       fd = open(segname, flags, mode);
 
       if (fd == -1)
@@ -831,7 +831,7 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
 
 void gdb_UnlinkDb()
 {
-  char segname[128];
+  pwr_tFileName segname;
   char busid[8];
   char* str = getenv(pwr_dEnvBusId);
   key_t key;
