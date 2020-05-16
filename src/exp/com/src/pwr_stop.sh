@@ -122,7 +122,16 @@
     source $pwrp_exe/pwrp_stop.sh
   fi
 
-  rm -f /tmp/pwr*$PWR_BUS_ID
+  tmpdir='/tmp/'
+
+  if [ $TMPDIR ]; then 
+	tmpdir=$TMPDIR
+  fi
+
+  rm $tmpdir/pwr*$PWR_BUS_ID
+  
+
+  #rm -f /tmp/pwr*$PWR_BUS_ID
 
   #rm -f /tmp/pwr*
   #id=`ipcs -s | grep $user | awk '{print $2}'`
