@@ -55,10 +55,13 @@
 
 #define gdb_cVersion 7
 
-#define gdb_cNameDatabase "/tmp/pwr_gdb"
-#define gdb_cNamePool "/tmp/pwr_pool"
-#define gdb_cNameRtdb "/tmp/pwr_rtdb"
-#define gdb_cNameDbLock "/tmp/pwr_db_lock"
+/* This can be overriden with TMPDIR */
+#define gdb_cDefaultTmpDir "/tmp/"
+
+#define gdb_cFileNameDatabase "pwr_gdb"
+#define gdb_cFileNamePool "pwr_pool"
+#define gdb_cFileNameRtdb "pwr_rtdb"
+#define gdb_cFileNameDbLock "pwr_db_lock"
 
 #define gdb_cMin_objects 3000
 #define gdb_cMin_volumes 30
@@ -999,6 +1002,11 @@ typedef struct {
   qcom_sAid my_aid; /**< The QueId of this job */
   pid_t my_pid; /**< The process id of this job */
   pwr_tBoolean is_tmon; /**< Set if tmon */
+
+  pwr_tFileName db_lock_path;
+  pwr_tFileName db_path; /* NOTE: no real need to have an actual file path here*/
+  pwr_tFileName pool_path;
+  pwr_tFileName rtdb_path;
 } gdb_sLocal;
 
 /* The root of all data, the only `global' variable...  */

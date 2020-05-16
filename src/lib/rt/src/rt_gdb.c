@@ -80,6 +80,22 @@ static int compCatt(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y)
     return 1;
 }
 
+/* Set paths for ftok-used files according to TMPDIR */
+
+static void initPaths(gdb_sLocal* root)
+{
+  char *tmpdir = getenv("TMPDIR");
+
+  if (!tmpdir) {
+	  tmpdir = gdb_cDefaultTmpDir;
+  }
+
+  sprintf(root->db_path, "%s/%s", tmpdir, gdb_cFileNameDatabase);
+  sprintf(root->db_lock_path, "%s/%s", tmpdir, gdb_cFileNameDbLock);
+  sprintf(root->pool_path, "%s/%s", tmpdir, gdb_cFileNamePool);
+  sprintf(root->rtdb_path, "%s/%s", tmpdir, gdb_cFileNameRtdb);
+}
+
 static void evaluateInit(gdb_sInit* ip)
 {
   ip->volumes = MAX(ip->volumes, gdb_cMin_volumes);
@@ -582,10 +598,14 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
 
   gdbroot->my_pid = getpid();
 
+  /* Init token files' paths. */
+
+  initPaths(gdbroot);
+
   /* Create lock section.  */
 
   gdbroot->lock = sect_Alloc(sts, &created, &gdbroot->h.lock,
-      sizeof(sect_sMutex), gdb_cNameDbLock, sect_mFlags_Create);
+      sizeof(sect_sMutex), gdbroot->db_lock_path, sect_mFlags_Create);
   if (gdbroot->lock == NULL)
     errh_Bugcheck(*sts, "creating database lock");
   if (!created)
@@ -595,21 +615,21 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
 
   evaluateInit(ip);
 
-  unlinkPool(gdb_cNamePool);
-  unlinkPool(gdb_cNameRtdb);
+  unlinkPool(gdbroot->pool_path);
+  unlinkPool(gdbroot->rtdb_path);
 
   gdbroot->pool = pool_Create(
-      sts, &gdbroot->h.pool, gdb_cNamePool, ip->pool_isize, ip->pool_esize);
+      sts, &gdbroot->h.pool, gdbroot->pool_path, ip->pool_isize, ip->pool_esize);
   if (gdbroot->pool == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
   gdbroot->rtdb = pool_Create(
-      sts, &gdbroot->h.rtdb, gdb_cNameRtdb, ip->rtdb_isize, ip->rtdb_esize);
+      sts, &gdbroot->h.rtdb, gdbroot->rtdb_path, ip->rtdb_isize, ip->rtdb_esize);
   if (gdbroot->rtdb == NULL)
     errh_Bugcheck(*sts, "initiating rtdb");
 
   gdbroot->db = pool_AllocNamedSegment(
-      sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
+      sts, gdbroot->pool, sizeof(*gdbroot->db), gdbroot->db_path);
   if (gdbroot->db == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -820,15 +840,15 @@ void gdb_UnlinkDb()
 
   /* Unlink pool. */
 
-  unlinkPool(gdb_cNamePool);
-  unlinkPool(gdb_cNameRtdb);
+  unlinkPool(gdbroot->pool_path);
+  unlinkPool(gdbroot->rtdb_path);
 
   /* Remove database lock. */
 
   strncpy(busid, (str ? str : "XXX"), 3);
   busid[3] = '\0';
 
-  sprintf(segname, "%s_%.3s", gdb_cNameDbLock, busid);
+  sprintf(segname, "%s_%.3s", gdbroot->db_lock_path, busid);
 
   key = ftok(segname, 'P');
   shm_id = shmget(key, 0, 0660);
@@ -1014,10 +1034,14 @@ gdb_sLocal* gdb_MapDb(pwr_tStatus* sts, qcom_sQid* qid, const char* name)
 
   gdbroot->my_pid = getpid();
 
+  /* Init token files' paths. */
+
+  initPaths(gdbroot);
+
   /* Map lock sections.  */
 
   gdbroot->lock = sect_Alloc(
-      sts, &created, &gdbroot->h.lock, sizeof(sect_sMutex), gdb_cNameDbLock, 0);
+      sts, &created, &gdbroot->h.lock, sizeof(sect_sMutex), gdbroot->db_lock_path, 0);
   if (gdbroot->lock == NULL) {
     errh_Fatal("Error mapping db lock\n%m", *sts);
     pwr_Return(NULL, sts, GDH__DBLOCK);
@@ -1029,16 +1053,16 @@ gdb_sLocal* gdb_MapDb(pwr_tStatus* sts, qcom_sQid* qid, const char* name)
 
   /* Map 'pool' & 'rtdb' pools.  */
 
-  gdbroot->pool = pool_Create(sts, &gdbroot->h.pool, gdb_cNamePool, 0, 0);
+  gdbroot->pool = pool_Create(sts, &gdbroot->h.pool, gdbroot->pool_path, 0, 0);
   if (gdbroot->pool == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
-  gdbroot->rtdb = pool_Create(sts, &gdbroot->h.rtdb, gdb_cNameRtdb, 0, 0);
+  gdbroot->rtdb = pool_Create(sts, &gdbroot->h.rtdb, gdbroot->rtdb_path, 0, 0);
   if (gdbroot->rtdb == NULL)
     errh_Bugcheck(*sts, "initiating rtdb");
 
   gdbroot->db = pool_AllocNamedSegment(
-      sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
+      sts, gdbroot->pool, sizeof(*gdbroot->db), gdbroot->db_path);
   if (gdbroot->db == NULL)
     errh_Bugcheck(*sts, "database directory");
 
