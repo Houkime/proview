@@ -42,13 +42,26 @@
 #include "rt_lck.h"
 
 static char lck_cName[lck_eLock__][40]
-    = { "/tmp/pwr_nmps_lock", "/tmp/pwr_time_lock", "/tmp/pwr_str_lock" };
+    = { "pwr_nmps_lock", "pwr_time_lock", "pwr_str_lock" };
 
 sect_sHead* lck_locksect[lck_eLock__] = {0, 0, 0};
+
+static void appendTmpdirPrefix(pwr_tFileName segname, char* name)
+{
+  char *tmpdir = getenv("TMPDIR");
+
+  if (!tmpdir) {
+	  tmpdir = lck_cDefaultTmpDir;
+  }
+
+  sprintf(segname, "%s/%s", tmpdir, name);
+}
+
 
 void lck_Create(pwr_tStatus* sts, lck_eLock lock)
 {
   pwr_tBoolean created;
+  pwr_tFileName segname;
 
   if (lock >= lck_eLock__) {
     *sts = 0;
@@ -60,8 +73,10 @@ void lck_Create(pwr_tStatus* sts, lck_eLock lock)
     return;
   }
 
+  appendTmpdirPrefix(segname, lck_cName[lock]);
+
   lck_locksect[lock] = sect_Alloc(sts, &created, 0, sizeof(sect_sMutex),
-      lck_cName[lock], sect_mFlags_Create);
+      segname, sect_mFlags_Create);
   if (ODD(*sts) && created)
     sect_InitLock(
         sts, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
@@ -87,7 +102,8 @@ void lck_Delete(pwr_tStatus* sts, lck_eLock lock)
     return;
   }
 
-  char segname[128];
+  pwr_tFileName proto_segname;
+  pwr_tFileName segname;
   char busid[8];
   char* str = getenv(pwr_dEnvBusId);
   key_t key;
@@ -97,7 +113,8 @@ void lck_Delete(pwr_tStatus* sts, lck_eLock lock)
   strncpy(busid, (str ? str : "XXX"), 3);
   busid[3] = '\0';
 
-  sprintf(segname, "%s_%.3s", lck_cName[lock], busid);
+  appendTmpdirPrefix(proto_segname, lck_cName[lock]);
+  sprintf(segname, "%s_%.3s", proto_segname, busid);
 
   key = ftok(segname, 'P');
   shm_id = shmget(key, 0, 0660);

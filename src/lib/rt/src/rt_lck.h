@@ -50,6 +50,8 @@ typedef enum {
   lck_eLock__
 } lck_eLock;
 
+#define lck_cDefaultTmpDir "/tmp/"
+
 #define lck_Lock(lock)                                                         \
   sect_Lock(NULL, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
 #define lck_Unlock(lock)                                                       \
