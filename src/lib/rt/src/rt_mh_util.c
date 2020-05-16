@@ -52,7 +52,8 @@
 
 /* Local definitions */
 
-#define SEM_NAME "/tmp/pwr_mh_sem_"
+#define DEF_TMPDIR "/tmp/"
+#define SEM_NAME "pwr_mh_sem_"
 static sem_t* sem = (sem_t*)-1;
 
 /* Local function prototypes */
@@ -61,14 +62,21 @@ static pwr_tStatus sendMessage(qcom_sQid*, mh_sHead*);
 
 static char* SemName()
 {
-  static char id[32];
+  static pwr_tFileName id;
+  static char* tmpdir = NULL;
   static char* str = NULL;
 
   if (str == NULL) {
     if ((str = getenv(pwr_dEnvBusId)) == NULL)
       return NULL;
+
+    if ((tmpdir = getenv("TMPDIR")) == NULL)
+      tmpdir = DEF_TMPDIR;
+
     sprintf(
-        id, "%s%.*s", SEM_NAME, (int)(sizeof(id) - strlen(SEM_NAME) - 1), str);
+        id, "%s/%s%.*s", tmpdir, SEM_NAME,
+	(int)(sizeof(id) - strlen(SEM_NAME) - strlen(tmpdir) - 2),
+	str);
     str = id;
   }
   return str;
