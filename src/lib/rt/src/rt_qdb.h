@@ -70,10 +70,12 @@ static const qcom_sQid qdb_cQimport = { qdb_cIimport, 0 };
 static const qcom_sQid qdb_cQexport = { qdb_cIexport, 0 };
 static const qcom_sQid qdb_cQmonitor = { qdb_cImonitor, 0 };
 
+/* This can be overriden with TMPDIR */
 #define qdb_cDefaultTmpDir "/tmp/"
+
+
 #define qdb_cFileNameDatabase "pwr_qdb"
 #define qdb_cFileNameDbLock "pwr_qdb_lock"
-
 #define qdb_cFileNamePool "pwr_qpool"
 
 #if defined OS_LINUX
@@ -670,7 +672,7 @@ typedef struct {
   qdb_sQue* exportque; /* the export que */
 
   pwr_tFileName db_lock_path;
-  pwr_tFileName db_path;
+  pwr_tFileName db_path; /* NOTE: no real need to have an actual file path here*/
   pwr_tFileName pool_path;
 } qdb_sLocal;
 
