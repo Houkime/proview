@@ -4,20 +4,6 @@ comma := ,
 empty :=
 space := $(empty) $(empty)
 
-pred_13	:= 12
-pred_12	:= 11
-pred_11	:= 10
-pred_10	:= 9
-pred_9	:= 8
-pred_8	:= 7
-pred_7	:= 6
-pred_6	:= 5
-pred_5	:= 4
-pred_4	:= 3
-pred_3	:= 2
-pred_2	:= 1
-pred_1	:= 0
-
 cwd_dirs := $(subst /,$(space),$(PWD))
 #cwd_dirs := $(subst .hw_,hw_,$(cwd_dirs))
 #cwd_dirs := $(subst .os_,os_,$(cwd_dirs))
@@ -30,7 +16,7 @@ word	:= $(words $(cwd_dirs))
 
 #prev	:= pred_ $(word)
 #pred	:= $(subst $(space),$(empty),$(prev))
-#word	:= $($(pred))
+#word	:= $(shell expr $(word) - 1)
 #os_name	:= $(word $(word), $(cwd_dirs))
 #ifneq ($(findstring os,$(os_name)),os)
 #include ___error___os
@@ -38,23 +24,17 @@ word	:= $(words $(cwd_dirs))
 
 #prev	:= pred_ $(word)
 #pred	:= $(subst $(space),$(empty),$(prev))
-#word	:= $($(pred))
+#word	:= $(shell expr $(word) - 1)
 src_name	:= $(word $(word), $(cwd_dirs))
 #ifneq ($(src_name),src)
 #include ___error___no_source_subdirectory
 #endif
 
-prev	:= pred_ $(word)
-pred	:= $(subst $(space),$(empty),$(prev))
-word	:= $($(pred))
+word	:= $(shell expr $(word) - 1)
 comp_name	:= $(word $(word), $(cwd_dirs))
 
-prev	:= pred_ $(word)
-pred	:= $(subst $(space),$(empty),$(prev))
-word	:= $($(pred))
+word	:= $(shell expr $(word) - 1)
 type_name	:= $(word $(word), $(cwd_dirs))
 
-prev	:= pred_ $(word)
-pred	:= $(subst $(space),$(empty),$(prev))
-word	:= $($(pred))
+word	:= $(shell expr $(word) - 1)
 root_name	:= $(word $(word), $(cwd_dirs))
