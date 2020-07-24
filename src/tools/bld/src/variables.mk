@@ -158,7 +158,7 @@ else
 endif
 
 explinkflags	:= $(cross_compile) -g -L$(elib_dir)
-cxxflags	:= $(cflags)
+cxxflags	:= -std=gnu++11 $(cflags)
 clis		= /lis=$(list)
 dolist	= /lis=$(list)
 domap		= -Xlinker -Map -Xlinker $(map)
