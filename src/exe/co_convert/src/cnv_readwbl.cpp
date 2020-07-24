@@ -1278,7 +1278,7 @@ char* CnvReadWbl::flags_to_string(int value)
     strcat(str, "RtHide|");
   if (value & pwr_mAdef_devhidevalue)
     strcat(str, "DevHideValue|");
-  if (str[strlen(str) - 1] == '|')
+  if (strlen(str) && str[strlen(str) - 1] == '|')
     str[strlen(str) - 1] = 0;
   return str;
 }
