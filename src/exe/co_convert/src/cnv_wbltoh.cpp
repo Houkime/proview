@@ -414,10 +414,9 @@ int CnvWblToH::attribute_exec()
     strcpy(pgmname, ctx->rw->attr_pgmname);
 
   if (str_StartsWith(CnvCtx::low(ctx->rw->attr_typeref), "pwr_etype_"))
-    strcpy(ctx->rw->attr_typeref, &ctx->rw->attr_typeref[strlen("pwr_etype_")]);
+    memmove(ctx->rw->attr_typeref, &ctx->rw->attr_typeref[strlen("pwr_etype_")],strlen(&ctx->rw->attr_typeref[strlen("pwr_etype_")])+1);
   else if (str_StartsWith(CnvCtx::low(ctx->rw->attr_typeref), "pwr_etypedef_"))
-    strcpy(
-        ctx->rw->attr_typeref, &ctx->rw->attr_typeref[strlen("pwr_etypedef_")]);
+        memmove(ctx->rw->attr_typeref, &ctx->rw->attr_typeref[strlen("pwr_etypedef_")], strlen(&ctx->rw->attr_typeref[strlen("pwr_etypedef_")])+1);
 
   if (streq(CnvCtx::low(ctx->rw->attr_type), "buffer")) {
     strcpy(type_name, "pwr_s");
