@@ -68,10 +68,10 @@
 int dcli_search_file(const char* name, char* found_file, int new)
 {
   static DIR* directory;
-  static char pattern[200];
-  static char dir[200];
-  char dev[2], dir2[200], file[80], type[80];
-  char cwd[200];
+  static char pattern[400];
+  static char dir[400];
+  char dev[2], dir2[400], file[80], type[80];
+  char cwd[400];
   int version;
   int found;
   static int wildcard;
@@ -159,10 +159,10 @@ int dcli_search_file(const char* name, char* found_file, int new)
 int dcli_search_directory(const char* name, char* found_file, int new)
 {
   static DIR* directory;
-  static char pattern[200];
-  static char dir[200];
-  char dev[2], dir2[200], file[80], type[80];
-  char cwd[200];
+  static char pattern[400];
+  static char dir[400];
+  char dev[2], dir2[400], file[80], type[80];
+  char cwd[400];
   int version;
   int found;
   static int wildcard;
@@ -319,9 +319,9 @@ int dcli_parse_filename(const char* filename, char* dev, char* dir, char* file,
     char* type, int* version)
 {
   char* s;
-  char ldev[200];
-  char ldir[200];
-  char lfile[200];
+  char ldev[400];
+  char ldir[400];
+  char lfile[400];
   char ltype[80];
 
   if ((s = strstr(filename, "::")))

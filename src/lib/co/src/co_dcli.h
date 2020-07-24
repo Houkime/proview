@@ -48,10 +48,10 @@ extern "C" {
 /* co_dcli.c
    Command line interpreter. */
 
-#define DCLI_CMD_SIZE 400
-#define DCLI_QUAL_SIZE 400
-#define DCLI_SYM_KEY_SIZE 200
-#define DCLI_SYM_VALUE_SIZE 200
+#define DCLI_CMD_SIZE 800
+#define DCLI_QUAL_SIZE 800
+#define DCLI_SYM_KEY_SIZE 400
+#define DCLI_SYM_VALUE_SIZE 400
 
 typedef struct {
   char command[20];
@@ -121,7 +121,7 @@ typedef struct s_element {
   char struct_begin;
   char name[256];
   unsigned int mask;
-  char filename[120];
+  char filename[400];
   int line_nr;
   struct s_element* next;
   struct s_element* prev;

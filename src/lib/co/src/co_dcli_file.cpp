@@ -52,7 +52,7 @@ typedef enum {
   dcli_eTrans_File
 } dcli_eTrans;
 
-static char dcli_default_directory[200] = "";
+static char dcli_default_directory[400] = "";
 
 void dcli_set_default_directory(char* dir)
 {
@@ -76,7 +76,7 @@ int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
     dcli_replace_env(filename, outname);
   } else {
     if (streq(dcli_default_directory, "")) {
-      char cwd[200];
+      char cwd[400];
 
       if (getcwd(cwd, sizeof(cwd)) != NULL) {
         strcpy(filename, cwd);
@@ -259,7 +259,7 @@ char* dcli_fgetname(FILE* fp, char* name, char* def_name)
 
 int dcli_translate_filename(char* out, const char* in)
 {
-  char out_name[200];
+  char out_name[400];
   const char* s;
   char* t;
   int i;

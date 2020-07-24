@@ -114,8 +114,8 @@ extern "C" {
 #define pwr_cSizFullName 199
 #define pwr_cSizOName 199
 #define pwr_cSizAName 399
-#define pwr_cSizFileName 255
-#define pwr_cSizCmd 399
+#define pwr_cSizFileName 455
+#define pwr_cSizCmd 799
 
 typedef void* pwr_tAddress; //!< Generic pointer type.
 typedef unsigned int pwr_tBit; //!< Bit type.

@@ -48,7 +48,7 @@ class wb_wblfile {
 public:
   wb_wbl_parser* parser;
   wb_wblnode* rootAST;
-  char file_name[200];
+  char file_name[400];
   pwr_tTime time;
 };
 

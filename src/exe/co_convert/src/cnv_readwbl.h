@@ -133,8 +133,8 @@ class CnvReadWbl {
   cread_eLine linetype;
   int state;
   int object_state;
-  char source_dir[200];
-  char current_file[200];
+  char source_dir[400];
+  char current_file[400];
   char attr_name[80];
   char attr_flags[200];
   char attr_type[80];
@@ -190,7 +190,7 @@ class CnvReadWbl {
   int doc_cnt;
   int doc_fresh;
   char sobject_name[80];
-  char dir[120];
+  char dir[400];
 
   char ObjBodyDef[80];
   char GraphPlcNode[80];

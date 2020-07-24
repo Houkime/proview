@@ -59,7 +59,7 @@ typedef struct {
 
 #define DCLI_SYMBOLTABLE_SIZE 500
 
-static char dcli_qual_str[10][2][400];
+static char dcli_qual_str[10][2][800];
 static dcli_t_symboltable dcli_symboltable[DCLI_SYMBOLTABLE_SIZE];
 static int dcli_symboltable_count;
 

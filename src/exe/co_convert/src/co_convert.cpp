@@ -54,7 +54,7 @@ extern "C" {
 #include "cnv_classdep.h"
 #include "cnv_changelog.h"
 
-typedef char cnv_tName[200];
+typedef char cnv_tName[300];
 
 static void usage()
 {
