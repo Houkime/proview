@@ -40,15 +40,52 @@
 # NOTE! This file removes all IPC objects for the user.
 # 	If you have other program which creates IPC objects,
 #	then do not use this script
-#
+
+uid=`id -u`
+
+
+function extract_cols(){
+
+filename=$1           #/proc/sysvipc/shm
+colname1=$2		#"uid"
+colname2=$3		#"shmid"
+header=true
+N=0
+
+result=""
+
+while read -r line;
+do
+	if $header
+	then
+		arr=($line)
+		for i in "${!arr[@]}"; do
+			if [[ "${arr[$i]}" = "${colname1}" ]]; then
+				N1=$i;
+			fi
+			if [[ "${arr[$i]}" = "${colname2}" ]]; then
+				N2=$i;
+			fi
+		done
+		header=false
+	else
+		arr=($line)
+		#	echo "${arr[$N]}";
+		result="$result ${arr[$N1]} ${arr[$N2]}\n"
+	fi
+done < $filename
+
+printf "$result"
+}
+
 # remove semaphores
-eval `ipcs -s|grep ^0x|grep "[ \t]$USER[ \t]"|awk '{printf "ipcrm sem %s;", $2}'`
+eval `extract_cols /proc/sysvipc/sem uid semid |grep "$uid "|awk '{printf "ipcrm sem %s;", $2}'`
 
 # remove message queues
-eval `ipcs -q|grep ^0x|grep "[ \t]$USER[ \t]"|awk '{printf "ipcrm msg %s;", $2}'`
+eval `extract_cols /proc/sysvipc/msg uid msqid |grep "$uid "|awk '{printf "ipcrm msg %s;", $2}'`
 
 # remove shared memory
-eval `ipcs -m|grep ^0x|grep "[ \t]$USER[ \t]"|awk '{printf "ipcrm shm %s;", $2}'`
+eval `extract_cols /proc/sysvipc/shm uid shmid |grep "$uid "|awk '{printf "ipcrm shm %s;", $2}'`
 
 tmpdir='/tmp/'
 
